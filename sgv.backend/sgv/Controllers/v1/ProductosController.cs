@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using sgv.Core.DTOs;
+using sgv.Core.Exceptions;
+using sgv.Core.Services.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel;
 using System.Net;
+using static sgv.Middlewares.ManejadorErroresMiddleware;
 
 namespace sgv.Controllers.v1;
 
@@ -10,35 +14,32 @@ namespace sgv.Controllers.v1;
 
 public class ProductosController : ControllerBase
 {
+    private readonly IProductosService _service;
 
-    [HttpGet]
-    //[AuthorizeResource("LeerTodos")]
+    public ProductosController(IProductosService service)
+    {
+        _service = service;
+    }
+
+    [HttpGet("codigoProducto")]
+    //[AuthorizeResource("LeerporCodigo")]
     [SwaggerOperation(
-     Summary = "Nos permite obtener informacion de los Usuarios de la BBDD del Poder Judicial",
-     Description = "Obtiene información de Usuarios que pertenecen a la BBDD del Poder Judicial.")]
-        public async Task<ActionResult<ArticuloDTO>> ObtenerArticuloPorCodigo()
+        Summary = "Nos permite obtener informacion de los Usuarios de la BBDD del Poder Judicial por codigo ususario",
+        Description = "Obtiene información de Usuarios que pertenecen a la BBDD del Poder Judicial por codigo usuario.")]
+    public async Task<ActionResult<ArticuloDTO>> ListadoUsuariosporCodigo(
+        [FromQuery][Description("Código único del usuario")] string codigoProducto)
+    {
+        if (string.IsNullOrEmpty(codigoProducto))
         {
-
-
-            var listado = await _service.ObtenerDatosdeUsuariosPoderJudicial();
-            if (listado.Any())
-            {
-                return Ok(new ApiResponse<List<UsuarioBBDDPoderJudicialDTO>>
-                {
-                    Success = true,
-                    Data = (List<UsuarioBBDDPoderJudicialDTO>)listado,
-                    StatusCode = (int)HttpStatusCode.OK
-                });
-            }
-            else
-            {
-                return Ok(new ApiResponse<object>
-                {
-                    Success = true,
-                    Data = null,
-                    StatusCode = (int)HttpStatusCode.OK,
-                    Errors = new List<string> { "La lista de elementos está vacía" }
-                });
-            }
+            throw new ReglasdeNegocioException("El código de usuario no puede estar vacío o tener valor igual a cero");
         }
+        var producto = await _service.ObtenerArticuloporCodigo(codigoProducto);   
+
+        return Ok(new ApiResponse<ArticuloDTO>
+        {
+            Success = true,
+            Data = (ArticuloDTO)producto,
+            StatusCode = (int)HttpStatusCode.OK
+        });
+    }
 }

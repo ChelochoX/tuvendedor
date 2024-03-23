@@ -1,6 +1,6 @@
-@sgv_HostAddress = http://localhost:5150
+@sgv_HostAddress = http://localhost:7265
 
-GET {{sgv_HostAddress}}/weatherforecast/
+GET {{sgv_HostAddress}}/api/v1/Productos/codigoProducto?codigoProducto=59012224
 Accept: application/json
 
 ###

@@ -7,4 +7,15 @@ public class Articulo
     public string Nombre { get; set; }
     public string Descripcion { get; set; }
     public string Grupo { get; set; }
+    public List<PlanDePago> PlanesDePago { get; set; }
+}
+
+// Clase que representa un plan de financiación
+public class PlanDePago
+{
+    public int IdPlanDePago { get; set; }
+    public decimal Entrega { get; set; }
+    public int Cuota { get; set; }
+    public decimal Importe { get; set; }
+    public string Moneda { get; set; }
 }
